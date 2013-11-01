@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from qifparse import account
-from qifparse.transaction import Transaction
-from qifparse import investment
-from qifparse import category
+from transaction import Transaction
+from account import Account
+from investment import Investment
+from category import Category
 
 NON_INVST_ACCOUNT_TYPES = [
     '!Type:Cash',
@@ -14,7 +14,7 @@ NON_INVST_ACCOUNT_TYPES = [
 ]
 
 
-class QIF(object):
+class Qif(object):
     def __init__(self, accounts=None, transactions=None,
                  categories=None, investments=None):
         self.accounts = accounts
@@ -38,7 +38,12 @@ class QifParserException(Exception):
 
 class QIFParser(object):
 
-    def parseQIFdata(self, data):
+    @classmethod
+    def parse(cls_, file_handle):
+        data = file_handle.read()
+        if isinstance(file_handle, type('')):
+            raise RuntimeError(
+                u"parse() takes in a file handle, not a string")
         if len(data) == 0:
             raise QifParserException('Data is empty')
         res = {
@@ -50,10 +55,10 @@ class QIFParser(object):
         chunks = data.split('\n^\n')
         last_type = None
         parsers = {
-            'categories': category.parseCategory,
-            'accounts': account.parseAccount,
+            'categories': Category.parse,
+            'accounts': Account.parse,
             'transactions': Transaction.parse,
-            'investments': investment.parseInvestment
+            'investments': Investment.parse
         }
         for chunk in chunks:
             if chunk.startswith('!Type:Cat'):
@@ -78,5 +83,5 @@ class QIFParser(object):
             if last_type == 'transactions':
                 parsed_item.account = res['accounts'][-1].name
             res[last_type].append(parsed_item)
-        res = QIF(**res)
+        res = Qif(**res)
         return res

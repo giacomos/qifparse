@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from qifparse.utils import parseQifDateTime
+from utils import parseQifDateTime
 
 
 class Investment(object):
@@ -22,38 +22,38 @@ class Investment(object):
     def __repr__(self):
         return "<Investment units=" + str(self.amount) + ">"
 
+    @classmethod
+    def parse(cls_, chunk):
+        """
+        """
 
-def parseInvestment(chunk):
-    """
-    """
-
-    curItem = Investment()
-    lines = chunk.split('\n')
-    for line in lines:
-        if not len(line) or line[0] == '\n' or line.startswith('!Type'):
-            continue
-        elif line[0] == 'D':
-            curItem.date = parseQifDateTime(line[1:])
-        elif line[0] == 'T':
-            curItem.amount = float(line[1:])
-        elif line[0] == 'N':
-            curItem.action = line[1:]
-        elif line[0] == 'Y':
-            curItem.security = line[1:]
-        elif line[0] == 'I':
-            curItem.price = line[1:]
-        elif line[0] == 'Q':
-            curItem.quantity = line[1:]
-        elif line[0] == 'C':
-            curItem.cleared = line[1:]
-        elif line[0] == 'M':
-            curItem.memo = line[1:]
-        elif line[0] == 'P':
-            curItem.first_line = line[1:]
-        elif line[0] == 'L':
-            curItem.to_account = line[2:-1]
-        elif line[0] == '$':
-            curItem.amount_transfer = float(line[1:])
-        elif line[0] == 'O':
-            curItem.commission = float(line[1:])
-    return curItem
+        curItem = Investment()
+        lines = chunk.split('\n')
+        for line in lines:
+            if not len(line) or line[0] == '\n' or line.startswith('!Type'):
+                continue
+            elif line[0] == 'D':
+                curItem.date = parseQifDateTime(line[1:])
+            elif line[0] == 'T':
+                curItem.amount = float(line[1:])
+            elif line[0] == 'N':
+                curItem.action = line[1:]
+            elif line[0] == 'Y':
+                curItem.security = line[1:]
+            elif line[0] == 'I':
+                curItem.price = line[1:]
+            elif line[0] == 'Q':
+                curItem.quantity = line[1:]
+            elif line[0] == 'C':
+                curItem.cleared = line[1:]
+            elif line[0] == 'M':
+                curItem.memo = line[1:]
+            elif line[0] == 'P':
+                curItem.first_line = line[1:]
+            elif line[0] == 'L':
+                curItem.to_account = line[2:-1]
+            elif line[0] == '$':
+                curItem.amount_transfer = float(line[1:])
+            elif line[0] == 'O':
+                curItem.commission = float(line[1:])
+        return curItem

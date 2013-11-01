@@ -33,28 +33,28 @@ class Category(object):
         res.append('^')
         return '\n'.join(res)
 
-
-def parseCategory(chunk):
-    """
-    """
-    curItem = Category()
-    lines = chunk.split('\n')
-    for line in lines:
-        if not len(line) or line[0] == '\n' or line.startswith('!Type'):
-            continue
-        elif line[0] == 'E':
-            curItem.expense_category = True
-        elif line[0] == 'I':
-            curItem.income_category = True
-            curItem.expense_category = False  # if ommitted is True
-        elif line[0] == 'T':
-            curItem.tax_related = True
-        elif line[0] == 'D':
-            curItem.description = line[1:]
-        elif line[0] == 'B':
-            curItem.budget_amount = line[1:]
-        elif line[0] == 'R':
-            curItem.tax_schedule_info = line[1:]
-        elif line[0] == 'N':
-            curItem.name = line[1:]
-    return curItem
+    @classmethod
+    def parse(cls_, chunk):
+        """
+        """
+        curItem = Category()
+        lines = chunk.split('\n')
+        for line in lines:
+            if not len(line) or line[0] == '\n' or line.startswith('!Type'):
+                continue
+            elif line[0] == 'E':
+                curItem.expense_category = True
+            elif line[0] == 'I':
+                curItem.income_category = True
+                curItem.expense_category = False  # if ommitted is True
+            elif line[0] == 'T':
+                curItem.tax_related = True
+            elif line[0] == 'D':
+                curItem.description = line[1:]
+            elif line[0] == 'B':
+                curItem.budget_amount = line[1:]
+            elif line[0] == 'R':
+                curItem.tax_schedule_info = line[1:]
+            elif line[0] == 'N':
+                curItem.name = line[1:]
+        return curItem

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from qifparse.utils import parseQifDateTime
+from utils import parseQifDateTime
 
 
 class Transaction(object):
@@ -24,7 +24,7 @@ class Transaction(object):
         return "<Transaction units=" + str(self.amount) + ">"
 
     @classmethod
-    def parse(chunk):
+    def parse(cls_, chunk):
         """
         """
 

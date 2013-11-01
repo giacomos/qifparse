@@ -28,15 +28,11 @@ setup(name='qifparse',
       license='GPL',
       packages=find_packages(exclude=['ez_setup']),
       include_package_data=True,
-      zip_safe=True,
+      zip_safe=False,
+      test_suite='qifparse',
       install_requires=[
           'setuptools',
-          'plone.app.dexterity',
-          'python-money',
-          'ofxparse',
-          # -*- Extra requirements: -*-
       ],
-      test_suite='tests',
       entry_points="""
       """,
       )
