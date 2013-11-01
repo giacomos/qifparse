@@ -19,10 +19,10 @@ def parseQifDateTime(qdate):
             qdate = qdate[:i] + "0" + qdate[i+1:]
     if len(qdate) == 10:  # new form with YYYY date
         iso_date = qdate[6:10] + "-" + qdate[3:5] + "-" + qdate[0:2]
-        return datetime.strptime(iso_date, '%Y-%M-%d')
+        return datetime.strptime(iso_date, '%Y-%m-%d')
     if qdate[5] == "'":
         C = "20"
     else:
         C = "19"
     iso_date = C + qdate[6:8] + "-" + qdate[3:5] + "-" + qdate[0:2]
-    return datetime.strptime(iso_date, '%Y-%M-%d')
+    return datetime.strptime(iso_date, '%Y-%m-%d')

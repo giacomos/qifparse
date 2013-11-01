@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 from utils import parseQifDateTime
+from . import DEFAULT_DATETIME_FORMAT
 
 
 class Transaction(object):
     def __init__(self):
-        self.account = None
+#        self.account = None
         self.to_account = None
+        self.date_format = DEFAULT_DATETIME_FORMAT
         self.splits = []
 
         self.date = None
@@ -23,12 +25,35 @@ class Transaction(object):
     def __repr__(self):
         return "<Transaction units=" + str(self.amount) + ">"
 
+    def __str__(self):
+        res = []
+        res.append('D' + self.date.strftime(self.date_format))
+        res.append('T%.2f' % self.amount)
+        if self.cleared:
+            res.append('C' + self.cleared)
+        if self.payee:
+            res.append('P' + self.payee)
+        if self.memo:
+            res.append('M' + self.memo)
+        if self.address:
+            res.append('A' + self.address)
+        if self.to_account:
+            res.append('L[%s]' % self.to_account)
+        elif self.category:
+            res.append('L' + self.category)
+        for split in self.splits:
+            res.append(str(split))
+        res.append('^')
+        return '\n'.join(res)
+
     @classmethod
-    def parse(cls_, chunk):
+    def parse(cls_, chunk, date_format=None):
         """
         """
 
         curItem = Transaction()
+        if date_format:
+            curItem.date_format = date_format
         lines = chunk.split('\n')
         for line in lines:
             if not len(line) or line[0] == '\n' or line.startswith('!Type'):
@@ -78,3 +103,14 @@ class AmountSplit(object):
         self.memo = None
 
         self.to_account = None
+
+    def __str__(self):
+        res = []
+        if self.category:
+            res.append('S' + self.category)
+        else:
+            res.append('S[%s]' % self.to_account)
+        res.append('$%.2f' % self.amount)
+        if self.memo:
+            res.append('E' + self.memo)
+        return '\n'.join(res)

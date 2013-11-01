@@ -10,6 +10,11 @@ class TestQIFParsing(unittest.TestCase):
         qif = QIFParser.parse(open(filename))
         self.assertTrue(qif)
 
+    def testWriteFile(self):
+        data = open(filename).read()
+        qif = QIFParser.parse(open(filename))
+        self.assertEquals(data, str(qif))
+
 
 if __name__ == "__main__":
     import unittest

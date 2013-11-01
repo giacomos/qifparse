@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 from utils import parseQifDateTime
+from . import DEFAULT_DATETIME_FORMAT
 
 
 class Investment(object):
     def __init__(self):
         self.account = None
         self.to_account = None  # L, account for a trasnfer
+        self.date_format = DEFAULT_DATETIME_FORMAT
 
         self.date = None  # D, date
         self.action = None  # N, investment action
@@ -22,12 +24,41 @@ class Investment(object):
     def __repr__(self):
         return "<Investment units=" + str(self.amount) + ">"
 
+    def __str__(self):
+        res = []
+        res.append('D' + self.date.strftime(self.date_format))
+        if self.action:
+            res.append('N' + self.action)
+        if self.security:
+            res.append('Y' + self.security)
+        if self.price:
+            res.append('I%.3f' % self.price)
+        if self.quantity:
+            res.append('Q' + self.quantity)
+        if self.cleared:
+            res.append('C' + self.cleared)
+        if self.amount:
+            res.append('T%.2f' % self.amount)
+        if self.memo:
+            res.append('M' + self.memo)
+        if self.first_line:
+            res.append('P' + self.first_line)
+        if self.to_account:
+            res.append('L[%s]' % self.to_account)
+            res.append('$%.2f' % self.amount_transfer)
+        if self.commission:
+            res.append('O' + self.commission)
+        res.append('^')
+        return '\n'.join(res)
+
     @classmethod
-    def parse(cls_, chunk):
+    def parse(cls_, chunk, date_format=None):
         """
         """
 
         curItem = Investment()
+        if date_format:
+            curItem.date_format = date_format
         lines = chunk.split('\n')
         for line in lines:
             if not len(line) or line[0] == '\n' or line.startswith('!Type'):
@@ -41,7 +72,7 @@ class Investment(object):
             elif line[0] == 'Y':
                 curItem.security = line[1:]
             elif line[0] == 'I':
-                curItem.price = line[1:]
+                curItem.price = float(line[1:])
             elif line[0] == 'Q':
                 curItem.quantity = line[1:]
             elif line[0] == 'C':

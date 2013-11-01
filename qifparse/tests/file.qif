@@ -35,10 +35,10 @@ $-17.00
 ^
 !Account
 NMy Cc
-TBank
+TInvst
 ^
 !Type:Invst
-D8/25/93
+D25/07/1993
 NShrsIn
 Yibm4
 I11.260
@@ -47,7 +47,7 @@ CX
 T1000.00
 MOpening
 ^
-D8/25/93
+D25/08/1993
 NBuyX
 Yibm4
 I11.030
@@ -57,5 +57,3 @@ MEst. price as of 8/25/93
 L[CHECKING]
 $100.00
 ^
-
-

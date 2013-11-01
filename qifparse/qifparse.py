@@ -3,6 +3,7 @@ from transaction import Transaction
 from account import Account
 from investment import Investment
 from category import Category
+from . import DEFAULT_DATETIME_FORMAT
 
 NON_INVST_ACCOUNT_TYPES = [
     '!Type:Cash',
@@ -22,13 +23,22 @@ class Qif(object):
         self.categories = categories
         self.investments = investments
 
-    def toString(self):
+    def __str__(self):
         res = []
         res.append('!Type:Cat')
         for cat in self.categories:
             res.append(str(cat))
         for acc in self.accounts:
             res.append(str(acc))
+            if acc.name in self.transactions:
+                res.append('!Type:%s' % acc.account_type)
+                for tr in self.transactions[acc.name]:
+                    res.append(str(tr))
+            if acc.name in self.investments:
+                res.append('!Type:%s' % acc.account_type)
+                for tr in self.investments[acc.name]:
+                    res.append(str(tr))
+        res.append('')
         return '\n'.join(res)
 
 
@@ -39,7 +49,7 @@ class QifParserException(Exception):
 class QIFParser(object):
 
     @classmethod
-    def parse(cls_, file_handle):
+    def parse(cls_, file_handle, date_format=None):
         if isinstance(file_handle, type('')):
             raise RuntimeError(
                 u"parse() takes in a file handle, not a string")
@@ -48,9 +58,9 @@ class QIFParser(object):
             raise QifParserException('Data is empty')
         res = {
             'accounts': [],
-            'transactions': [],
             'categories': [],
-            'investments': []
+            'transactions': {},
+            'investments': {}
         }
         chunks = data.split('\n^\n')
         last_type = None
@@ -61,6 +71,8 @@ class QIFParser(object):
             'investments': Investment.parse
         }
         for chunk in chunks:
+            if not chunk:
+                continue
             if chunk.startswith('!Type:Cat'):
                 last_type = 'categories'
             elif chunk.startswith('!Account'):
@@ -79,9 +91,14 @@ class QIFParser(object):
                 raise QifParserException('Header not reconized')
             # if no header is recognized then
             # we use the previous one
-            parsed_item = parsers[last_type](chunk)
-            if last_type == 'transactions':
-                parsed_item.account = res['accounts'][-1].name
-            res[last_type].append(parsed_item)
+            if last_type == 'transactions' or last_type == 'investments':
+                parsed_item = parsers[last_type](chunk, date_format)
+                account = res['accounts'][-1].name
+                if not account in res[last_type]:
+                    res[last_type][account] = []
+                res[last_type][account].append(parsed_item)
+            else:
+                parsed_item = parsers[last_type](chunk)
+                res[last_type].append(parsed_item)
         res = Qif(**res)
         return res
