@@ -1,18 +1,18 @@
 import unittest
 import os
-from qifparse.parser import QIFParser
+from qifparse.parser import QifParser
 
 filename = os.path.join(os.path.dirname(__file__), 'file.qif')
 
 class TestQIFParsing(unittest.TestCase):
 
     def testParseFile(self):
-        qif = QIFParser.parse(open(filename))
+        qif = QifParser.parse(open(filename))
         self.assertTrue(qif)
 
     def testWriteFile(self):
         data = open(filename).read()
-        qif = QIFParser.parse(open(filename))
+        qif = QifParser.parse(open(filename))
         self.assertEquals(data, str(qif))
 
 

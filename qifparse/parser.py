@@ -47,7 +47,7 @@ class QifParserException(Exception):
     pass
 
 
-class QIFParser(object):
+class QifParser(object):
 
     @classmethod
     def parse(cls_, file_handle, date_format=None):
