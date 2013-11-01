@@ -1,16 +1,13 @@
-import sys
-sys.path.append('..')
-from unittest import TestCase
-from qifparse import account
-from qifparse import transaction
-from qifparse import investment
-from qifparse import category
+import unittest
+import os
 from qifparse.qifparse import QIFParser
 
-class TestQIFParsing(TestCase):
+filename = os.path.join(os.path.dirname(__file__), u'file.qif')
 
-    def testSuccess(self):
-        qif = QIFParser.parse(open_file('file.qif'), True)
+class TestQIFParsing(unittest.TestCase):
+
+    def testParseFile(self):
+        qif = QIFParser.parse(open(filename))
         self.assertTrue(qif)
 
 

@@ -40,10 +40,10 @@ class QIFParser(object):
 
     @classmethod
     def parse(cls_, file_handle):
-        data = file_handle.read()
         if isinstance(file_handle, type('')):
             raise RuntimeError(
                 u"parse() takes in a file handle, not a string")
+        data = file_handle.read()
         if len(data) == 0:
             raise QifParserException('Data is empty')
         res = {
