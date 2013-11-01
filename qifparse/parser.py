@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-from transaction import Transaction
-from account import Account
-from investment import Investment
-from category import Category
+import six
+from qifparse.transaction import Transaction
+from qifparse.account import Account
+from qifparse.investment import Investment
+from qifparse.category import Category
 from . import DEFAULT_DATETIME_FORMAT
 
 NON_INVST_ACCOUNT_TYPES = [
@@ -52,7 +53,7 @@ class QIFParser(object):
     def parse(cls_, file_handle, date_format=None):
         if isinstance(file_handle, type('')):
             raise RuntimeError(
-                u"parse() takes in a file handle, not a string")
+                six.u("parse() takes in a file handle, not a string"))
         data = file_handle.read()
         if len(data) == 0:
             raise QifParserException('Data is empty')

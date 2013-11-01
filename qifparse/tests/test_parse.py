@@ -1,6 +1,6 @@
 import unittest
 import os
-from qifparse.qifparse import QIFParser
+from qifparse.parser import QIFParser
 
 filename = os.path.join(os.path.dirname(__file__), u'file.qif')
 

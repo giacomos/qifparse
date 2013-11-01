@@ -32,6 +32,7 @@ setup(name='qifparse',
       test_suite='qifparse',
       install_requires=[
           'setuptools',
+          'six',
       ],
       entry_points="""
       """,

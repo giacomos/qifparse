@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from utils import parseQifDateTime
+from qifparse.utils import parseQifDateTime
 
 
 class Account(object):
@@ -53,5 +53,5 @@ class Account(object):
             elif line[0] == '$':
                 curItem.balance_amount = line[1:]
             else:
-                print 'Line not recognized: ' + line
+                print('Line not recognized: ' + line)
         return curItem

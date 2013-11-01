@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from utils import parseQifDateTime
+from qifparse.utils import parseQifDateTime
 from . import DEFAULT_DATETIME_FORMAT
 
 
