@@ -4,7 +4,7 @@ version = '0.1'
 
 setup(name='qifparse',
       version=version,
-      description="",
+      description="a parser for Quicken interchange format files (.qif).",
       long_description=open("./README.rst", "r").read(),
       # Get more strings from
       # http://pypi.python.org/pypi?:action=list_classifiers
