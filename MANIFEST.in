@@ -1,0 +1,7 @@
+include *.txt
+include *.rst
+include *.qif
+
+recursive-include qifparse *
+
+global-exclude *.pyc
