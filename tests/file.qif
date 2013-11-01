@@ -1,0 +1,61 @@
+!Type:Cat
+Nfood
+E
+^
+Nfood:lunch
+E
+^
+!Account
+NMy Cash
+TCash
+^
+!Type:Cash
+D23/10/2013
+T-6.50
+Lfood:lunch
+^
+D22/10/2013
+T-6.00
+Lfood:lunch
+^
+D21/10/2013
+T-5.00
+Lfood:lunch
+^
+D11/10/2013
+T31.00
+L[My Cc]
+^
+D11/10/2013
+T-48.00
+S[My Cc]
+$-31.00
+Sfood:lunch
+$-17.00
+^
+!Account
+NMy Cc
+TBank
+^
+!Type:Invst
+D8/25/93
+NShrsIn
+Yibm4
+I11.260
+Q88.81
+CX
+T1000.00
+MOpening
+^
+D8/25/93
+NBuyX
+Yibm4
+I11.030
+Q9.066
+T100.00
+MEst. price as of 8/25/93
+L[CHECKING]
+$100.00
+^
+
+
