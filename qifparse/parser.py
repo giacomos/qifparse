@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 import six
 from datetime import datetime
-from qifparse.transaction import Transaction
-from qifparse.transaction import AmountSplit
-from qifparse.account import Account
-from qifparse.investment import Investment
-from qifparse.category import Category
-from qifparse.qif import Qif
-from . import DEFAULT_DATETIME_FORMAT
+from qifparse.qif import (
+    Transaction,
+    AmountSplit,
+    Account,
+    Investment,
+    Category,
+    Qif,
+)
 
 NON_INVST_ACCOUNT_TYPES = [
     '!Type:Cash',
@@ -38,7 +39,7 @@ class QifParser(object):
         last_type = None
         last_account = None
         parsers = {
-            'categories': Category.parse,
+            'categories': cls_.parseCategory,
             'accounts': cls_.parseAccount,
             'transactions': cls_.parseTransaction,
             'investments': cls_.parseInvestment
@@ -73,6 +74,32 @@ class QifParser(object):
                 parsed_item = parsers[last_type](chunk, date_format)
                 last_account.add(parsed_item)
         return qif_obj
+
+    @classmethod
+    def parseCategory(cls_, chunk):
+        """
+        """
+        curItem = Category()
+        lines = chunk.split('\n')
+        for line in lines:
+            if not len(line) or line[0] == '\n' or line.startswith('!Type'):
+                continue
+            elif line[0] == 'E':
+                curItem.expense_category = True
+            elif line[0] == 'I':
+                curItem.income_category = True
+                curItem.expense_category = False  # if ommitted is True
+            elif line[0] == 'T':
+                curItem.tax_related = True
+            elif line[0] == 'D':
+                curItem.description = line[1:]
+            elif line[0] == 'B':
+                curItem.budget_amount = line[1:]
+            elif line[0] == 'R':
+                curItem.tax_schedule_info = line[1:]
+            elif line[0] == 'N':
+                curItem.name = line[1:]
+        return curItem
 
     @classmethod
     def parseAccount(cls_, chunk):
@@ -171,7 +198,7 @@ class QifParser(object):
             elif line[0] == 'I':
                 curItem.price = float(line[1:])
             elif line[0] == 'Q':
-                curItem.quantity = line[1:]
+                curItem.quantity = float(line[1:])
             elif line[0] == 'C':
                 curItem.cleared = line[1:]
             elif line[0] == 'M':
