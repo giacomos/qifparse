@@ -139,7 +139,9 @@ class AmountSplit(BaseEntry):
     _fields = [
         Field('category', 'string', 'S'),
         Field('to_account', 'reference', 'S'),
-        Field('amount', 'float', '$', required=True),
+        Field('amount', 'float', '$'),
+        Field('percent', 'string', '%'),
+        Field('address', 'string', 'A'),
         Field('memo', 'string', 'M'),
     ]
     _sub_entry = True
