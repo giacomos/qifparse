@@ -18,16 +18,20 @@ class Qif(object):
     def __init__(self):
         self._accounts = []
         self._categories = []
+        self._classes = []
 
     def add(self, item):
         if not isinstance(item, Account) and \
-           not isinstance(item, Category):
+           not isinstance(item, Category) and \
+           not isinstance(item, Class):
             raise RuntimeError(
-                six.u("%s in not an Account or a Category"))
+                six.u("%s in not an Account or a Category or a Class"))
         elif isinstance(item, Account):
             self._accounts.append(item)
-        else:
+        elif isinstance(item, Category):
             self._categories.append(item)
+        else:
+            self._classes.append(item)
 
     def get_account(self, name, default=None):
         for acc in self._accounts:
@@ -46,6 +50,10 @@ class Qif(object):
     def categories(self):
         return tuple(self._categories)
 
+    @property
+    def classes(self):
+        return tuple(self._classes)
+
     def __str__(self):
         res = []
         res.append('!Type:Cat')
@@ -53,6 +61,10 @@ class Qif(object):
             res.append(str(cat))
         for acc in self._accounts:
             res.append(str(acc))
+        if self._classes:
+            res.append('!Type:Class')
+            for cat in self._classes:
+                res.append(str(cat))
         res.append('')
         return '\n'.join(res)
 
@@ -220,4 +232,11 @@ class Category(BaseEntry):
         Field('income', 'boolean', 'I'),
         Field('budget_amount', 'float', 'B'),
         Field('tax_schedule_amount', 'string', 'R'),
+    ]
+
+
+class Class(BaseEntry):
+    _fields = [
+        Field('name', 'string', 'N', required=True),
+        Field('description', 'string', 'D'),
     ]

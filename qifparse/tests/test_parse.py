@@ -15,6 +15,9 @@ class TestQIFParsing(unittest.TestCase):
     def testWriteFile(self):
         data = open(filename).read()
         qif = QifParser.parse(open(filename))
+#        out = open('out.qif','w')
+#        out.write(str(qif))
+#        out.close()
         self.assertEquals(data, str(qif))
 
 

@@ -1,6 +1,12 @@
 Changelog
 ===========
 
+0.4 (unreleased)
+----------------
+* address can be multilines
+* split can have the address attribute
+* add support for Classes
+
 0.3 (2013-11-02)
 ----------------
 * more refactoring, now the lib is much more simple and engineered

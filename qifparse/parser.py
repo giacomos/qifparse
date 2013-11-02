@@ -7,6 +7,7 @@ from qifparse.qif import (
     Account,
     Investment,
     Category,
+    Class,
     Qif,
 )
 
@@ -39,41 +40,58 @@ class QifParser(object):
         last_type = None
         last_account = None
         parsers = {
-            'categories': cls_.parseCategory,
-            'accounts': cls_.parseAccount,
-            'transactions': cls_.parseTransaction,
-            'investments': cls_.parseInvestment
+            'category': cls_.parseCategory,
+            'account': cls_.parseAccount,
+            'transaction': cls_.parseTransaction,
+            'investment': cls_.parseInvestment,
+            'class': cls_.parseClass
         }
         for chunk in chunks:
             if not chunk:
                 continue
             if chunk.startswith('!Type:Cat'):
-                last_type = 'categories'
+                last_type = 'category'
             elif chunk.startswith('!Account'):
-                last_type = 'accounts'
+                last_type = 'account'
             elif chunk.split('\n')[0] in NON_INVST_ACCOUNT_TYPES:
-                last_type = 'transactions'
+                last_type = 'transaction'
             elif chunk.startswith('!Type:Invst'):
-                last_type = 'investments'
-                # TODO: I should check if the previous accout
-                # is actually and investment account
+                last_type = 'investment'
+                # TODO: should I check if the previous accout
+                # is actually an investment account?
             elif chunk.startswith('!Type:Class'):
-                continue  # yet to be done!
+                last_type = 'class'
             elif chunk.startswith('!Type:Memorized'):
                 continue  # yet to be done!
             elif chunk.startswith('!'):
                 raise QifParserException('Header not reconized')
             # if no header is recognized then
             # we use the previous one
-            if last_type in ['categories', 'accounts']:
+            if last_type in ['category', 'account', 'class']:
                 parsed_item = parsers[last_type](chunk)
-                if last_type == 'accounts':
+                if last_type == 'account':
                     last_account = parsed_item
                 qif_obj.add(parsed_item)
             else:
                 parsed_item = parsers[last_type](chunk, date_format)
                 last_account.add(parsed_item)
         return qif_obj
+
+    @classmethod
+    def parseClass(cls_, chunk):
+        """
+        """
+        curItem = Class()
+        lines = chunk.split('\n')
+        for line in lines:
+            if not len(line) or line[0] == '\n' or \
+                    line.startswith('!Type:Class'):
+                continue
+            elif line[0] == 'N':
+                curItem.name = line[1:]
+            elif line[0] == 'D':
+                curItem.description = line[1:]
+        return curItem
 
     @classmethod
     def parseCategory(cls_, chunk):
