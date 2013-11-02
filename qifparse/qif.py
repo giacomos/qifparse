@@ -250,8 +250,13 @@ class Account(BaseEntry):
 
     account_type = property(get_type, set_type)
 
-    def __repr__(self):
-        return '<Account: %s>' % self.name
+    @property
+    def transactions(self):
+        return tuple(self._transactions)
+
+    @property
+    def memorize_transactions(self):
+        return tuple(self._memorized)
 
     def __str__(self):
         res = []
