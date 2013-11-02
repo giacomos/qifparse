@@ -8,9 +8,9 @@ qifparse is a parser for Quicken interchange format files (.qif).
 
 Even if the qif format is:
 
-   * quite old now
-   * not supported for import by Quicken any more,
-   * ambiguous in some data management (notably on dates)
+* quite old now
+* not supported for import by Quicken any more,
+* ambiguous in some data management (notably on dates)
 
 it's still quite commonly used by many personal finance managers.
 
