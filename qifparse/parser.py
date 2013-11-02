@@ -149,7 +149,10 @@ class QifParser(object):
             elif line[0] == 'M':
                 curItem.memo = line[1:]
             elif line[0] == 'A':
-                curItem.address = line[1:]
+                value = line[1:]
+                if curItem.address:
+                    value = curItem.address + '\n' + line[1:]
+                curItem.address = value
             elif line[0] == 'L':
                 cat = line[1:]
                 if cat.startswith('['):
@@ -167,6 +170,12 @@ class QifParser(object):
             elif line[0] == 'E':
                 split = curItem.splits[-1]
                 split.memo = line[1:-1]
+            elif line[0] == 'A':
+                value = line[1:]
+                split = curItem.splits[-1]
+                if split.address:
+                    value = split.address + '\n' + line[1:]
+                split.address = value
             elif line[0] == '$':
                 split = curItem.splits[-1]
                 split.amount = float(line[1:-1])
