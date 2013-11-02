@@ -20,6 +20,9 @@ L[My Cc]
 ^
 D11/10/2013
 T-48.00
+Avia Roma
+A44100, Ferrara
+AItaly
 S[My Cc]
 $-31.00
 Sfood:lunch
@@ -48,6 +51,16 @@ T100.00
 MEst. price as of 8/25/93
 L[CHECKING]
 $100.00
+^
+!Type:Memorized
+T-50.00
+PJoe Hayes
+MRent
+KC
+^
+T-25.00
+LTelephone
+KP
 ^
 !Type:Class
 Nmy class

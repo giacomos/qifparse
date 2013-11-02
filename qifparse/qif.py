@@ -13,6 +13,14 @@ ACCOUNT_TYPES = [
     'Invst',
 ]
 
+MEMORIZED_TRANSACTION_TYPES = [
+    'C',  # Check
+    'D',  # Deposit
+    'P',  # Payment
+    'I',  # Investment
+    'E',  # Electronic payee
+]
+
 
 class Qif(object):
     def __init__(self):
@@ -104,6 +112,9 @@ class BaseEntry(object):
                 res.append(cformat % (field.first_letter, val))
             elif field.ftype == 'string':
                 res.append('%s%s' % (field.first_letter, val))
+            elif field.ftype == 'multilinestring':
+                for line in val:
+                    res.append('%s%s' % (field.first_letter, line))
             elif field.ftype == 'float':
                 res.append('%s%.2f' % (field.first_letter, val))
             elif field.ftype == 'integer':
@@ -124,11 +135,12 @@ class Transaction(BaseEntry):
     _sub_entry = True
     _fields = [
         Field('date', 'datetime', 'D', required=True, default=datetime.now()),
+        Field('num', 'string', 'N'),
         Field('amount', 'float', 'T', required=True),
         Field('cleared', 'string', 'C'),
         Field('payee', 'string', 'P'),
         Field('memo', 'string', 'M'),
-        Field('address', 'string', 'A'),
+        Field('address', 'multilinestring', 'A'),
         Field('category', 'string', 'L'),
         Field('to_account', 'reference', 'L'),
     ]
@@ -147,13 +159,39 @@ class Transaction(BaseEntry):
         return '\n'.join(res)
 
 
+class MemorizedTransaction(Transaction):
+    _fields = [field for field in Transaction._fields
+               if field.name not in ['date', 'num']]
+    _fields.extend([
+        Field('mtype', 'string', 'K'),
+        Field('first_payment_date', 'datetime', '1'),
+        Field('years_of_loan', 'string', '2'),
+        Field('num_payments_done', 'string', '3'),
+        Field('periods_per_year', 'string', '4'),
+        Field('interests_rate', 'string', '5'),
+        Field('current_loan_balance', 'string', '6'),
+        Field('original_loan_amount', 'string', '7'),
+    ])
+
+    def set_mtype(self, type):
+        if type and type not in MEMORIZED_TRANSACTION_TYPES:
+            raise RuntimeError(
+                six.u("%s is not a valid memorized transaction type" % type))
+        self._mtype = type
+
+    def get_mtype(self):
+        return self._mtype
+
+    mtype = property(get_mtype, set_mtype)
+
+
 class AmountSplit(BaseEntry):
     _fields = [
         Field('category', 'string', 'S'),
         Field('to_account', 'reference', 'S'),
         Field('amount', 'float', '$'),
         Field('percent', 'string', '%'),
-        Field('address', 'string', 'A'),
+        Field('address', 'multilinestring', 'A'),
         Field('memo', 'string', 'M'),
     ]
     _sub_entry = True
@@ -189,13 +227,17 @@ class Account(BaseEntry):
     def __init__(self, *args, **kwargs):
         super(Account, self).__init__(*args, **kwargs)
         self._transactions = []
+        self._memorized = []
 
     def add(self, item):
         if not isinstance(item, Transaction) and \
            not isinstance(item, Investment):
             raise RuntimeError(
                 six.u("item is not a Transaction or an Investment"))
-        self._transactions.append(item)
+        elif isinstance(item, MemorizedTransaction):
+            self._memorized.append(item)
+        else:
+            self._transactions.append(item)
 
     def set_type(self, type):
         if type and type not in ACCOUNT_TYPES:
@@ -219,6 +261,10 @@ class Account(BaseEntry):
         if self._transactions:
             res.append('!Type:%s' % self.account_type)
             for tr in self._transactions:
+                res.append(str(tr))
+        if self._memorized:
+            res.append('!Type:Memorized')
+            for tr in self._memorized:
                 res.append(str(tr))
         return '\n'.join(res)
 

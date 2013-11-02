@@ -6,6 +6,7 @@ Changelog
 * address can be multilines
 * split can have the address attribute
 * add support for Classes
+* add support for MemorizedTransaction
 
 0.3 (2013-11-02)
 ----------------
