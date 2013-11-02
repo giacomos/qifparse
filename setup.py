@@ -1,8 +1,9 @@
+import os
 from setuptools import setup, find_packages
 
 version = '0.3'
 long_description = open("README.rst").read() + "\n" + \
-    open(os.path.join("docs", "CHANGELOG.rst")).read()
+    open("CHANGELOG.rst").read()
 
 setup(name='qifparse',
       version=version,
