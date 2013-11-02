@@ -32,6 +32,10 @@ class Qif(object):
     def accounts(self):
         return tuple(self._accounts)
 
+    @property
+    def categories(self):
+        return tuple(self._categories)
+
     def __str__(self):
         res = []
         res.append('!Type:Cat')

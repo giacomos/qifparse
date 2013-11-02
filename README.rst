@@ -17,7 +17,7 @@ Here's a sample program::
    >>> qif = QifParser.parse(file('file.qif'))
 
    >>> qif.accounts
-   [<Account: My Cash>, <Account: My Cc>]
+   (<Account: My Cash>, <Account: My Cc>)
 
    >>> qif.accounts[0].name
    'My Cash'
