@@ -1,8 +1,10 @@
+# -*- coding: utf-8 -*-
 import unittest
 import os
 from qifparse.parser import QifParser
 
 filename = os.path.join(os.path.dirname(__file__), 'file.qif')
+
 
 class TestQIFParsing(unittest.TestCase):
 

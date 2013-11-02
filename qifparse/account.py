@@ -1,16 +1,48 @@
 # -*- coding: utf-8 -*-
-from qifparse.utils import parseQifDateTime
+import six
+from qifparse.transaction import Transaction
+from qifparse.investment import Investment
+
+ACCOUNT_TYPES = [
+    'Cash',
+    'Bank',
+    'Ccard',
+    'Oth A',
+    'Oth L',
+    'Invoice',  # Quicken for business only
+    'Invst',
+]
 
 
 class Account(object):
 
-    def __init__(self):
-        self.name = None  # N
-        self.description = None  # D
-        self.account_type = None  # T
-        self.credit_limit = None  # L
-        self.balance_date = None  # /
-        self.balance_amount = None  # $
+    def __init__(self, name=None, type=None, description=None,
+                 credit_limit=None, balance_date=None, balance_amount=None):
+        self.name = name  # N
+        self.description = description  # D
+        self.account_type = type  # T
+        self.credit_limit = credit_limit  # L
+        self.balance_date = balance_date  # /
+        self.balance_amount = balance_amount  # $
+        self._transactions = []
+
+    def add(self, item):
+        if not isinstance(item, Transaction) and \
+           not isinstance(item, Investment):
+            raise RuntimeError(
+                six.u("item is not a Transaction or an Investment"))
+        self._transactions.append(item)
+
+    def set_type(self, type):
+        if type and type not in ACCOUNT_TYPES:
+            raise RuntimeError(
+                six.u("%s is not a valid account type" % type))
+        self._type = type
+
+    def get_type(self):
+        return self._type
+
+    account_type = property(get_type, set_type)
 
     def __repr__(self):
         return '<Account: %s>' % self.name
@@ -29,29 +61,8 @@ class Account(object):
         if self.balance_amount:
             res.append('$' + self.balance_amount)
         res.append('^')
+        if self._transactions:
+            res.append('!Type:%s' % self.account_type)
+            for tr in self._transactions:
+                res.append(str(tr))
         return '\n'.join(res)
-
-    @classmethod
-    def parse(cls_, chunk):
-        """
-        """
-        curItem = Account()
-        lines = chunk.split('\n')
-        for line in lines:
-            if not len(line) or line[0] == '\n' or line.startswith('!Account'):
-                continue
-            elif line[0] == 'N':
-                curItem.name = line[1:]
-            elif line[0] == 'D':
-                curItem.description = line[1:]
-            elif line[0] == 'T':
-                curItem.account_type = line[1:]
-            elif line[0] == 'L':
-                curItem.credit_limit = line[1:]
-            elif line[0] == '/':
-                curItem.balance_date = parseQifDateTime(line[1:])
-            elif line[0] == '$':
-                curItem.balance_amount = line[1:]
-            else:
-                print('Line not recognized: ' + line)
-        return curItem
