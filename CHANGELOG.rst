@@ -1,7 +1,7 @@
 Changelog
 ===========
 
-0.4 (unreleased)
+0.4 (2013-11-02)
 ----------------
 * address can be multilines
 * split can have the address attribute
