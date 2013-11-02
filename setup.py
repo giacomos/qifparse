@@ -1,11 +1,13 @@
 from setuptools import setup, find_packages
 
 version = '0.3'
+long_description = open("README.rst").read() + "\n" + \
+    open(os.path.join("docs", "CHANGELOG.rst")).read()
 
 setup(name='qifparse',
       version=version,
       description="a parser for Quicken interchange format files (.qif).",
-      long_description=open("./README.rst", "r").read(),
+      long_description=long_description,
       # Get more strings from
       # http://pypi.python.org/pypi?:action=list_classifiers
       classifiers=[
