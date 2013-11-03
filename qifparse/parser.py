@@ -40,6 +40,7 @@ class QifParser(object):
         chunks = data.split('\n^\n')
         last_type = None
         last_account = None
+        transactions_header = None
         parsers = {
             'category': cls_.parseCategory,
             'account': cls_.parseAccount,
@@ -51,32 +52,42 @@ class QifParser(object):
         for chunk in chunks:
             if not chunk:
                 continue
-            if chunk.startswith('!Type:Cat'):
+            first_line = chunk.split('\n')[0]
+            if first_line == '!Type:Cat':
                 last_type = 'category'
-            elif chunk.startswith('!Account'):
+            elif first_line == '!Account':
                 last_type = 'account'
-            elif chunk.split('\n')[0] in NON_INVST_ACCOUNT_TYPES:
+            elif first_line in NON_INVST_ACCOUNT_TYPES:
                 last_type = 'transaction'
-            elif chunk.startswith('!Type:Invst'):
+                transactions_header = first_line
+            elif first_line == '!Type:Invst':
                 last_type = 'investment'
-                # TODO: should I check if the previous accout
-                # is actually an investment account?
-            elif chunk.startswith('!Type:Class'):
+                transactions_header = first_line
+            elif first_line == '!Type:Class':
                 last_type = 'class'
-            elif chunk.startswith('!Type:Memorized'):
+            elif first_line == '!Type:Memorized':
                 last_type = 'memorized'
+                transactions_header = first_line
             elif chunk.startswith('!'):
                 raise QifParserException('Header not reconized')
             # if no header is recognized then
             # we use the previous one
-            if last_type in ['category', 'account', 'class']:
-                parsed_item = parsers[last_type](chunk)
-                if last_type == 'account':
-                    last_account = parsed_item
-                qif_obj.add(parsed_item)
-            else:
-                parsed_item = parsers[last_type](chunk, date_format)
-                last_account.add(parsed_item)
+            item = parsers[last_type](chunk)
+            if last_type == 'account':
+                qif_obj.add_account(item)
+                last_account = item
+            elif last_type == 'transaction'\
+                    or last_type == 'memorized' or last_type == 'investment':
+                if last_account:
+                    last_account.add_transaction(item,
+                                                 header=transactions_header)
+                else:
+                    qif_obj.add_transaction(item,
+                                            header=transactions_header)
+            elif last_type == 'category':
+                qif_obj.add_category(item)
+            elif last_type == 'class':
+                qif_obj.add_class(item)
         return qif_obj
 
     @classmethod

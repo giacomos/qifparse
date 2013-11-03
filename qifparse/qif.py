@@ -27,52 +27,100 @@ class Qif(object):
         self._accounts = []
         self._categories = []
         self._classes = []
+        self._transactions = {}
+        self._last_header = None
 
-    def add(self, item):
-        if not isinstance(item, Account) and \
-           not isinstance(item, Category) and \
-           not isinstance(item, Class):
-            raise RuntimeError(
-                six.u("%s in not an Account or a Category or a Class"))
-        elif isinstance(item, Account):
-            self._accounts.append(item)
-        elif isinstance(item, Category):
-            self._categories.append(item)
+    def add_account(self, item):
+        if not isinstance(item, Account):
+            raise RuntimeError(six.u("item not recognized"))
+        self._accounts.append(item)
+
+    def add_category(self, item):
+        if not isinstance(item, Category):
+            raise RuntimeError(six.u("item not recognized"))
+        self._categories.append(item)
+
+    def add_class(self, item):
+        if not isinstance(item, Class):
+            raise RuntimeError(six.u("item not recognized"))
+        self._classes.append(item)
+
+    def add_transaction(self, item, header=None):
+        if not isinstance(item, Transaction)\
+                and not isinstance(item, MemorizedTransaction):
+            raise RuntimeError(six.u("item not recognized"))
+        if header and not header in self._transactions:
+            self._transactions[header] = []
+        if not header:
+            header = self._last_header
         else:
-            self._classes.append(item)
+            self._last_header = header
+        if not header:
+            raise RuntimeError(six.u("no header provided yet"))
+        self._transactions[header].append(item)
 
-    def get_account(self, name, default=None):
+    def get_accounts(self, name=None, atype=None):
+        if not name and not atype:
+            return tuple(self._accounts)
+        res = []
         for acc in self._accounts:
-            if acc.name == name:
-                return acc
-        if not default:
+            valid_name = (not name or acc.name == name) and True or False
+            valid_type = (not atype or acc.account_type == atype) \
+                and True or False
+            if valid_name and valid_type:
+                res.append(acc)
+        return tuple(res)
+
+    def get_categories(self, name=None, income=None, expense=None):
+        if income and expense:
             raise RuntimeError(
-                six.u("account not found"))
-        return None
+                six.u("item can be either income or expense, not both"))
+        if not name and not income and not expense:
+            return tuple(self._categories)
+        res = []
+        for cat in self._categories:
+            valid_name = (not name or cat.name == name) and True or False
+            valid_income = (not income or
+                            cat.income == income) and True or False
+            valid_expense = (not expense or
+                             cat.expense == expense) and True or False
+            if valid_name and valid_income and valid_expense:
+                res.append(cat)
+        return tuple(res)
 
-    @property
-    def accounts(self):
-        return tuple(self._accounts)
+    def get_classes(self, name=None):
+        if not name:
+            return tuple(self._classes)
+        res = [klass for klass in self._classes if klass.name == name]
+        return tuple(res)
 
-    @property
-    def categories(self):
-        return tuple(self._categories)
-
-    @property
-    def classes(self):
-        return tuple(self._classes)
+    def get_transactions(self, recursive=False):
+        if not recursive:
+            return tuple(self._transactions.values())
+        else:
+            tr = []
+            tr.extend(self._transactions.values)
+            for acc in self._accounts:
+                tr.extend(acc.transactions)
 
     def __str__(self):
         res = []
-        res.append('!Type:Cat')
-        for cat in self._categories:
-            res.append(str(cat))
+        if self._categories:
+            res.append('!Type:Cat')
+            for cat in self._categories:
+                res.append(str(cat))
         for acc in self._accounts:
             res.append(str(acc))
         if self._classes:
             res.append('!Type:Class')
             for cat in self._classes:
                 res.append(str(cat))
+        if self._transactions:
+            for header in self._transactions.keys():
+                transactions = self._transactions[header]
+                res.append(header)
+                for tr in transactions:
+                    res.append(str(tr))
         res.append('')
         return '\n'.join(res)
 
@@ -93,10 +141,11 @@ class BaseEntry(object):
     _fields = []
     _sub_entry = False
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, **kwargs):
         self.date_format = DEFAULT_DATETIME_FORMAT
         for field in self._fields:
-            setattr(self, field.name, field.default)
+            val = kwargs.get(field.name, field.default)
+            setattr(self, field.name, val)
 
     def __str__(self):
         res = []
@@ -145,8 +194,8 @@ class Transaction(BaseEntry):
         Field('to_account', 'reference', 'L'),
     ]
 
-    def __init__(self, *args, **kwargs):
-        super(Transaction, self).__init__(*args, **kwargs)
+    def __init__(self, **kwargs):
+        super(Transaction, self).__init__(**kwargs)
         self.splits = []
 
     def __str__(self):
@@ -224,20 +273,25 @@ class Account(BaseEntry):
         Field('balance_amount', 'float', '$')
     ]
 
-    def __init__(self, *args, **kwargs):
-        super(Account, self).__init__(*args, **kwargs)
-        self._transactions = []
-        self._memorized = []
+    def __init__(self, **kwargs):
+        super(Account, self).__init__(**kwargs)
+        self._transactions = {}
+        self._last_header = None
 
-    def add(self, item):
+    def add_transaction(self, item, header=None):
         if not isinstance(item, Transaction) and \
            not isinstance(item, Investment):
             raise RuntimeError(
                 six.u("item is not a Transaction or an Investment"))
-        elif isinstance(item, MemorizedTransaction):
-            self._memorized.append(item)
+        if header and not header in self._transactions:
+            self._transactions[header] = []
+        if not header:
+            header = self._last_header
         else:
-            self._transactions.append(item)
+            self._last_header = header
+        if not header:
+            raise RuntimeError(six.u("no header provided yet"))
+        self._transactions[header].append(item)
 
     def set_type(self, type):
         if type and type not in ACCOUNT_TYPES:
@@ -250,13 +304,8 @@ class Account(BaseEntry):
 
     account_type = property(get_type, set_type)
 
-    @property
-    def transactions(self):
+    def get_transactions(self):
         return tuple(self._transactions)
-
-    @property
-    def memorize_transactions(self):
-        return tuple(self._memorized)
 
     def __str__(self):
         res = []
@@ -264,13 +313,11 @@ class Account(BaseEntry):
         fields = super(Account, self).__str__()
         res.append(fields)
         if self._transactions:
-            res.append('!Type:%s' % self.account_type)
-            for tr in self._transactions:
-                res.append(str(tr))
-        if self._memorized:
-            res.append('!Type:Memorized')
-            for tr in self._memorized:
-                res.append(str(tr))
+            for header in self._transactions.keys():
+                transactions = self._transactions[header]
+                res.append(header)
+                for tr in transactions:
+                    res.append(str(tr))
         return '\n'.join(res)
 
 

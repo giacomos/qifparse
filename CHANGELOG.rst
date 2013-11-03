@@ -1,6 +1,11 @@
 Changelog
 ===========
 
+0.5 (2013-11-03)
+----------------
+* now transactions can also be outside accounts
+* moved properties to method in order to accept filters
+
 0.4 (2013-11-02)
 ----------------
 * address can be multilines
