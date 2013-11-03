@@ -7,3 +7,6 @@ python:
   - "3.3"
 script:
   - python setup.py test
+branches:
+  only:
+    - master
