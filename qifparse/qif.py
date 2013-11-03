@@ -6,7 +6,7 @@ from qifparse import DEFAULT_DATETIME_FORMAT
 ACCOUNT_TYPES = [
     'Cash',
     'Bank',
-    'Ccard',
+    'CCard',
     'Oth A',
     'Oth L',
     'Invoice',  # Quicken for business only
@@ -191,6 +191,8 @@ class Transaction(BaseEntry):
         Field('memo', 'string', 'M'),
         Field('address', 'multilinestring', 'A'),
         Field('category', 'string', 'L'),
+        Field('reimbursable_expense', 'boolean', 'F'),
+        Field('small_business_expense', 'boolean', 'X'),
         Field('to_account', 'reference', 'L'),
     ]
 

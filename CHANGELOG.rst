@@ -1,6 +1,10 @@
 Changelog
 ===========
 
+0.6 (unreleased)
+----------------
+* fixed typo in account types
+
 0.5 (2013-11-03)
 ----------------
 * now transactions can also be outside accounts
