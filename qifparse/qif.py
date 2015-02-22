@@ -164,8 +164,8 @@ class BaseEntry(object):
             elif field.ftype == 'multilinestring':
                 for line in val:
                     res.append('%s%s' % (field.first_letter, line))
-            elif field.ftype == 'float':
-                res.append('%s%.2f' % (field.first_letter, val))
+            elif field.ftype == 'decimal':
+                res.append('%s%s' % (field.first_letter, val))
             elif field.ftype == 'integer':
                 res.append('%s%d' % (field.first_letter, val))
             elif field.ftype == 'datetime':
@@ -185,7 +185,7 @@ class Transaction(BaseEntry):
     _fields = [
         Field('date', 'datetime', 'D', required=True, default=datetime.now()),
         Field('num', 'string', 'N'),
-        Field('amount', 'float', 'T', required=True),
+        Field('amount', 'decimal', 'T', required=True),
         Field('cleared', 'string', 'C'),
         Field('payee', 'string', 'P'),
         Field('memo', 'string', 'M'),
@@ -240,7 +240,7 @@ class AmountSplit(BaseEntry):
     _fields = [
         Field('category', 'string', 'S'),
         Field('to_account', 'reference', 'S'),
-        Field('amount', 'float', '$'),
+        Field('amount', 'decimal', '$'),
         Field('percent', 'string', '%'),
         Field('address', 'multilinestring', 'A'),
         Field('memo', 'string', 'M'),
@@ -253,15 +253,15 @@ class Investment(BaseEntry):
         Field('date', 'datetime', 'D', required=True, default=datetime.now()),
         Field('action', 'string', 'N'),
         Field('security', 'string', 'Y'),
-        Field('price', 'float', 'I', custom_print_format='%s%.3f'),
-        Field('quantity', 'float', 'Q', custom_print_format='%s%.3f'),
+        Field('price', 'decimal', 'I', custom_print_format='%s%.3f'),
+        Field('quantity', 'decimal', 'Q', custom_print_format='%s%.3f'),
         Field('cleared', 'string', 'C'),
-        Field('amount', 'float', 'T'),
+        Field('amount', 'decimal', 'T'),
         Field('memo', 'string', 'M'),
         Field('first_line', 'string', 'P'),
         Field('to_account', 'reference', 'L'),
-        Field('amount_transfer', 'float', '$'),
-        Field('commission', 'float', 'O'),
+        Field('amount_transfer', 'decimal', '$'),
+        Field('commission', 'decimal', 'O'),
     ]
 
 
@@ -270,9 +270,9 @@ class Account(BaseEntry):
         Field('name', 'string', 'N', required=True),
         Field('description', 'string', 'D'),
         Field('account_type', 'string', 'T'),
-        Field('credit_limit', 'float', 'L'),
+        Field('credit_limit', 'decimal', 'L'),
         Field('balance_date', 'datetime', '/'),
-        Field('balance_amount', 'float', '$')
+        Field('balance_amount', 'decimal', '$')
     ]
 
     def __init__(self, **kwargs):
@@ -330,7 +330,7 @@ class Category(BaseEntry):
         Field('tax_related', 'boolean', 'T'),
         Field('expense', 'boolean', 'E', default=True),
         Field('income', 'boolean', 'I'),
-        Field('budget_amount', 'float', 'B'),
+        Field('budget_amount', 'decimal', 'B'),
         Field('tax_schedule_amount', 'string', 'R'),
     ]
 
