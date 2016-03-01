@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import six
 from datetime import datetime
+from decimal import Decimal
 from qifparse.qif import (
     Transaction,
     MemorizedTransaction,
@@ -171,7 +172,7 @@ class QifParser(object):
                     line.startswith('!Type:Memorized'):
                 continue
             elif line[0] == 'T':
-                curItem.amount = float(line[1:])
+                curItem.amount = Decimal(line[1:])
             elif line[0] == 'C':
                 curItem.cleared = line[1:]
             elif line[0] == 'P':
@@ -208,7 +209,7 @@ class QifParser(object):
                 split.address.append(line[1:])
             elif line[0] == '$':
                 split = curItem.splits[-1]
-                split.amount = float(line[1:-1])
+                split.amount = Decimal(line[1:])
             else:
                 # don't recognise this line; ignore it
                 print ("Skipping unknown line:\n" + str(line))
@@ -231,7 +232,7 @@ class QifParser(object):
             elif line[0] == 'N':
                 curItem.num = line[1:]
             elif line[0] == 'T':
-                curItem.amount = float(line[1:])
+                curItem.amount = Decimal(line[1:])
             elif line[0] == 'C':
                 curItem.cleared = line[1:]
             elif line[0] == 'P':
@@ -280,7 +281,7 @@ class QifParser(object):
                 split.address.append(line[1:])
             elif line[0] == '$':
                 split = curItem.splits[-1]
-                split.amount = float(line[1:-1])
+                split.amount = Decimal(line[1:])
             else:
                 # don't recognise this line; ignore it
                 print ("Skipping unknown line:\n" + str(line))
@@ -301,15 +302,15 @@ class QifParser(object):
             elif line[0] == 'D':
                 curItem.date = cls_.parseQifDateTime(line[1:])
             elif line[0] == 'T':
-                curItem.amount = float(line[1:])
+                curItem.amount = Decimal(line[1:])
             elif line[0] == 'N':
                 curItem.action = line[1:]
             elif line[0] == 'Y':
                 curItem.security = line[1:]
             elif line[0] == 'I':
-                curItem.price = float(line[1:])
+                curItem.price = Decimal(line[1:])
             elif line[0] == 'Q':
-                curItem.quantity = float(line[1:])
+                curItem.quantity = Decimal(line[1:])
             elif line[0] == 'C':
                 curItem.cleared = line[1:]
             elif line[0] == 'M':
@@ -319,9 +320,9 @@ class QifParser(object):
             elif line[0] == 'L':
                 curItem.to_account = line[2:-1]
             elif line[0] == '$':
-                curItem.amount_transfer = float(line[1:])
+                curItem.amount_transfer = Decimal(line[1:])
             elif line[0] == 'O':
-                curItem.commission = float(line[1:])
+                curItem.commission = Decimal(line[1:])
         return curItem
 
     @classmethod
