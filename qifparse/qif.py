@@ -307,7 +307,7 @@ class Account(BaseEntry):
     account_type = property(get_type, set_type)
 
     def get_transactions(self):
-        return tuple(self._transactions)
+        return tuple(self._transactions.values())
 
     def __str__(self):
         res = []
